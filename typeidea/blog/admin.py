@@ -30,16 +30,33 @@ class TagAdmin(admin.ModelAdmin):
         return super(TagAdmin, self).save_model(request, obj, form, change)
 
 
+class CategoryOwnerFilter(admin.SimpleListFilter):
+    """自定义只展示当前用户分类过滤器"""
+    title = '分类过滤器'
+    parameter_name = 'owner_category'
+
+    def lookups(self, request, model_admin):
+        print("cccccccccccccccc", Category.objects.filter(owner=request.user).values_list('id', 'name'))
+        return Category.objects.filter(owner=request.user).values_list('id', 'name')
+
+    def queryset(self, request, queryset):
+        category_id = self.value()
+        print('category_id:', category_id)
+        if category_id:
+            return queryset.filter(category_id=category_id)
+        return queryset
+
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     # list_display配置列表页面展示哪些字段
-    list_display = ['title', 'category', 'status', 'created_time', 'operator']
+    list_display = ['title', 'category', 'status', 'created_time', 'operator', 'owner']
 
     # list_display_links配置哪些字段可以作为链接进行点击，如果为None，则不配置任何可点击的字段
     list_display_links = []
 
     # list_filter配置页面过滤器，需要通过哪些字段过滤页面。
-    list_filter = ['category']
+    list_filter = [CategoryOwnerFilter]  # 自定义过滤条件
 
     # search_fields配置搜索字段
     search_fields = ['title', 'category__name']
@@ -64,7 +81,7 @@ class PostAdmin(admin.ModelAdmin):
     def operator(self, obj):
         return format_html(
             '<a href="{}">编辑</a>',
-            reverse('admin:blog_post_change', args=(obj, id))
+            reverse('admin:blog_post_change', args=(obj.id, ))
         )
     operator.short_description = '操作'
 
