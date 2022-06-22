@@ -1,3 +1,4 @@
+from django.contrib.admin.models import LogEntry
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
@@ -18,7 +19,7 @@ class PostInline(admin.TabularInline):  # 可选择继承admin.StackedInline获�
 class CategoryAdmin(BaseOwnerAdmin):
     inlines = [PostInline, ]
     list_display = ('name', 'status', 'is_nav', 'created_time', 'post_count')
-    fields = ('name', 'status', 'is_nav', 'owner')
+    fields = ('name', 'status', 'is_nav', )
 
     def post_count(self, obj):
         return obj.post_set.count()
@@ -122,3 +123,9 @@ class PostAdmin(BaseOwnerAdmin):
             'all': ("https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css",),
         }
         js = ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js',)
+
+
+@admin.register(LogEntry, site=custom_site)
+class LogEntryADmin(admin.ModelAdmin ):
+    list_display = ['object_repr', 'object_id', 'action_flag', 'user',
+                    'change_message']
