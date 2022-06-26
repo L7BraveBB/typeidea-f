@@ -26,6 +26,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'typeidea',  # 新加，post_lis template html文件所在的app
     'blog',
     'config',
     'comment',
