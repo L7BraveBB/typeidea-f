@@ -26,6 +26,29 @@ class Category(models.Model):
         """将模型已字符串的方式输出"""
         return self.name
 
+    @classmethod
+    def get_navs(cls):
+        try:
+            categories = cls.objects.filter(status=cls.STATUS_NORMAL)
+            # nav_categories = categories.filter(is_nav=True)
+            # normal_categories = categories.filter(is_nav=False)
+            # 这两句重构为下面代码，因为每次查询会产生两次I/O操作，数据量大的时候产生影响
+            # 下面操作可以一次拿出所有数据，然后再内存中进行处理
+            nav_categories = []
+            normal_categories = []
+            for cate in categories:
+                if cate.is_nav:
+                    nav_categories.append(cate)
+                else:
+                    normal_categories.append(cate)
+
+            return {
+                'navs': nav_categories,
+                'categories': normal_categories,
+            }
+        except Exception as e:
+            print("Category model's get_navs error!!!! ", e)
+
 
 class Tag(models.Model):
     STATUS_NORMAL = 1
@@ -75,3 +98,33 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    @staticmethod
+    def get_by_tag(tag_id):
+        try:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            tag = None
+            post_list = []
+        else:
+            post_list = tag.post_set.filter(status=Post.STATUS_NORMAL). \
+                select_related('owner', 'category')
+
+        return post_list, tag
+
+    @staticmethod
+    def get_by_category(category_id):
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            category = None
+            post_list = []
+        else:
+            post_list = category.post_set.filter(status=Post.STATUS_NORMAL) \
+                .select_related('owner', 'category')
+        return post_list, category
+
+    @classmethod
+    def latest_posts(cls):
+        queryset = cls.objects.filter(status=cls.STATUS_NORMAL)
+        return queryset

@@ -1,3 +1,23 @@
+<div>顶部分类：
+    {% for cate in navs %}
+    <a href="/category/{{ cate.id }}/">{{ cate.name }}</a>
+    {% endfor %}
+</div>
 
-    <h1>detail</h1>
-    {{ name }}
+{% if post %}
+<h1>{{ post.title }}</h1>
+<div>
+    <span>分类：{{ post.category.name }}</span>
+    <span>作者：{{ post.owner.username }}</span>
+</div>
+<hr/>
+<p>
+    {{ post.content }}
+</p>
+{% endif %}
+
+<div>底部分类：
+    {% for cate in categories %}
+    <a href="/category/{{ cate.id }}/">{{ cate.name }}</a>
+    {% endfor %}
+</div>

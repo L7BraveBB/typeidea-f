@@ -56,3 +56,4 @@ class SideBar(models.Model):
 
     def __str__(self):
         return self.title
+
