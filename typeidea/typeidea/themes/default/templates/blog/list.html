@@ -1,10 +1,4 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <meta charset="UTF-8"/>
-    <title>typeidea博客系统</title>
-</head>
-<body>
+
 {% extends "./base.html" %}
     {% block title %}
     {% if tag %}
@@ -27,9 +21,21 @@
         <p>{{ post.desc }}</p>
     </li>
     {% endfor %}
+
+    {% if page_obj %}
+
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
+        {% endif %}
+        Page {{ page_obj.number }} of {{  paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">下一页</a>
+        {% endif %}
+
+    {% endif %}
+
 </ul>
 {% endblock %}
 
 
-</body>
-</html>
