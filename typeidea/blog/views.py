@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
@@ -22,7 +23,7 @@ class CommonViewMixin:
 
 class IndexView(ListView):
     queryset = Post.latest_posts()
-    paginate_by = 1  # 自带分野共，此处，把每页的数量设置为5
+    paginate_by = 1  # 自带分野功能，此处，把每页的数量设置为5
     context_object_name = 'post_list'  # 如果不设置此项，在模板中则需要使用object_list变量
     template_name = 'blog/list.html'
 
@@ -73,6 +74,32 @@ class PostListView(ListView):
     paginate_by = 1  # 自带分页功能，此处，把每页的数量设置为1
     context_object_name = 'post_list'  # 如果不设置此项，在模板中则需要使用object_list变量
     template_name = 'blog/list.html'
+
+
+class SearchView(IndexView):
+    def get_context_data(self):
+        context = super(SearchView, self).get_context_data()
+        context.update({
+            'keyword': self.request.GET.get('keyword', '')
+        })
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        keyword = self.request.GET.get('keyword')
+        if not keyword:
+            return queryset
+        return queryset.filter(Q(title__icontains=keyword)
+                               | Q(desc__icontains=keyword))
+
+
+class AuthorView(IndexView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        print("queryset:::::", queryset)
+        author_id = self.kwargs.get('owner_id')
+        return queryset.filter(owner_id=author_id)
+    # TODO lsit.html作者部分改为post.owner.username页面报错问题记录, why??
 
 
 def post_list(request, category_id=None, tag_id=None):  # 参数是从urls.py的url中传递过来的
