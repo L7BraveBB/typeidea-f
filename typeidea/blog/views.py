@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.views.generic import DetailView, ListView
 
+from comment.forms import CommentForm
+from comment.models import Comment
 from .models import Tag, Post, Category
 from config.models import SideBar
 
@@ -59,14 +61,22 @@ class TagView(IndexView):
         """重写queryset，根据分类过滤"""
         queryset = super().get_queryset()
         tag_id = self.kwargs.get('tag_id')
-        return queryset.filter(tag_id=tag_id)
+        return queryset.filter(tag=tag_id)  # TODO tag_id=tag_id改为tag=tag_id暂时没发现问题
 
 
 class PostDetailView(CommonViewMixin, DetailView):
     queryset = Post.latest_posts()
     template_name = 'blog/detail.html'
     context_object_name = 'post'
-    pk_url_kwarg = 'post_id'
+    pk_url_kwarg = 'pk'
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context.update({
+    #         'comment_form': CommentForm,
+    #         'comment_list': Comment.get_by_target(self.request.path)
+    #     })
+    #     return context
 
 
 class PostListView(ListView):

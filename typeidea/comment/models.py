@@ -11,7 +11,8 @@ class Comment(models.Model):
         (STATUS_NORMAL, '正常'),
         (STATUS_DELETE, '删除'),
     )
-    target = models.ForeignKey(Post, verbose_name='评论目标', on_delete=models.CASCADE)  # 不加级联删除会报错，版本问题
+    # target = models.ForeignKey(Post, verbose_name='评论目标', on_delete=models.CASCADE)  # 不加级联删除会报错，版本问题
+    target = models.CharField(max_length=100, verbose_name='评论目标')
     content = models.CharField(max_length=2000, verbose_name='内容')
     nickname = models.CharField(max_length=50, verbose_name='昵称')
     website = models.URLField(verbose_name='网站')
@@ -22,5 +23,6 @@ class Comment(models.Model):
     class Mate:
         verbose_name = verbose_name_plural = '评论'
 
-    def __str__(self):
-        return self.content
+    @classmethod
+    def get_by_target(cls, target):
+        return cls.objects.filter(target=target, status=cls.STATUS_NORMAL)
