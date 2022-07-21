@@ -1,3 +1,4 @@
+import mistune
 from django import forms
 
 
@@ -41,6 +42,7 @@ class CommentForm(forms.ModelForm):
         content = self.clean_data.get('content')
         if len(content) < 10:
             raise forms.ValidationError('内容长度不少于10个字！！')
+        content = mistune.markdown(content)
         return content
 
     class Meta:
