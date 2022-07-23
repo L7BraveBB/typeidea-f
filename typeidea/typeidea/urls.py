@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.sitemaps import views as sitemap_view
 
 from comment.views import CommentView
 from typeidea.custom_site import custom_site
 from blog.views import (IndexView, CategoryView, TagView, PostDetailView,
                         SearchView, AuthorView)
 from config.views import LinksListView
+from blog.rss import LatestPostFeed
+from blog.sitemap import PostSitemap
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
@@ -31,6 +34,8 @@ urlpatterns = [
     url(r'^search/$', SearchView.as_view(), name='search'),
     url(r'^author/(?P<owner_id>\d+)/$', AuthorView.as_view(), name='author'),
     url(r'^comment/$', CommentView.as_view(), name='comment'),
+    url(r'^rss|feed/', LatestPostFeed(), name='rss'),
+    url(r'^sitemap\.xml', sitemap_view.sitemap, {'sitemaps': {'posts': PostSitemap}}),
 
     url(r'^super_admin/', admin.site.urls, name='super-admin'),
     url(r'^admin/', custom_site.urls, name='admin'),
