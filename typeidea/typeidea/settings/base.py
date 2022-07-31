@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'blog',
     'config',
     'comment',
+    'rest_framework',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -112,3 +113,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'themes', THEME, "static")
 ]
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 2
+}
